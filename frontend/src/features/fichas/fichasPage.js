@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthProvider";
+import ConfirmDialog from "../../components/ui/ModalConfirmacion";
 import { useNavigate } from "react-router-dom";
 import { 
   Button, TextField, Table, TableBody, TableCell, TableContainer, 
@@ -15,6 +16,8 @@ const FichasTable = () => {
   const [searchInput, setSearchInput] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [fichaAEliminar, setFichaAEliminar] = useState(null);
   const [formData, setFormData] = useState({
     numero_ficha: "",
     nombre_programa: "",
@@ -60,13 +63,20 @@ const FichasTable = () => {
     navigate(`/fichas/ver/${id}`);
   };
 
-  const eliminarFicha = (id) => {
-    if (window.confirm("¿Estás seguro de eliminar esta ficha?")) {
-      axios.delete(`http://localhost:3000/fichas/eliminar/${id}`)
-        .then(() => {
-          setFichas(fichas.filter((ficha) => ficha.id_ficha !== id));
-        })
-        .catch((error) => console.error("Error al eliminar la ficha:", error));
+
+  const confirmarEliminacion = (ficha) => {
+    setFichaAEliminar(ficha);
+    setDialogOpen(true);
+  };
+
+  const eliminarFichaConfirmada = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/fichas/eliminar/${fichaAEliminar.id_ficha}`);
+      setFichas(fichas.filter(f => f.id_ficha !== fichaAEliminar.id_ficha));
+      setDialogOpen(false);
+      setFichaAEliminar(null);
+    } catch (error) {
+      console.error("Error al eliminar la ficha:", error);
     }
   };
 
@@ -174,16 +184,8 @@ const FichasTable = () => {
             }}
           />
         </IconButton>
-        <IconButton onClick={() => eliminarFicha(ficha.id_ficha)}>
-          <ContentCutOutlined
-            sx={{
-              backgroundColor: "red",
-              p: 1,
-              fontSize: "30px",
-              color: "white",
-              borderRadius: "5px",
-            }}
-          />
+        <IconButton onClick={() => confirmarEliminacion(ficha)}>
+                    <ContentCutOutlined sx={{ backgroundColor: "red", p: 1, fontSize: "30px", color: "white", borderRadius: "5px" }} />
         </IconButton>
       </TableCell>
     </TableRow>
@@ -191,6 +193,15 @@ const FichasTable = () => {
 </TableBody>
 </Table>
       </TableContainer>
+
+      <ConfirmDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onConfirm={eliminarFichaConfirmada}
+        title="¿Estás seguro?"
+        message={`¿Deseas eliminar la ficha N° ${fichaAEliminar?.numero_ficha}? Esta acción no se puede deshacer.`}
+      />
+
       
       <Dialog
   open={isModalVisible}
