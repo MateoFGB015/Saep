@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import UserInfoModal from '../../components/ui/UserInfoModal';
+import ConfirmDialog from '../../components/ui/ModalConfirmacion'; // ✅ Modal de confirmación
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import { useParams } from 'react-router-dom';
 import {
@@ -20,6 +22,39 @@ const FichaDetalle = () => {
   const { id } = useParams();
   const [fichas, setFicha] = useState(null);
   const [aprendices, setAprendices] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openUserModal, setOpenUserModal] = useState(false);
+
+  const [openConfirm, setOpenConfirm] = useState(false); // ✅ Modal confirmación
+  const [aprendizAEliminar, setAprendizAEliminar] = useState(null); // ✅ Aprendiz a eliminar
+
+  const handleVerUsuario = (usuario) => {
+    setSelectedUser(usuario);
+    setOpenUserModal(true);
+  };
+
+  const handleConfirmarEliminar = (aprendiz) => {
+    setAprendizAEliminar(aprendiz);
+    setOpenConfirm(true);
+  };
+
+  const eliminarAprendiz = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/ficha-aprendiz/eliminar`, {
+        data: {
+          id_usuario: aprendizAEliminar.id_usuario,
+          id_ficha: id,
+        },
+      });
+
+      // Eliminar del estado local
+      setAprendices(aprendices.filter(a => a.id_usuario !== aprendizAEliminar.id_usuario));
+      setOpenConfirm(false);
+      setAprendizAEliminar(null);
+    } catch (error) {
+      console.error('❌ Error al eliminar el aprendiz:', error);
+    }
+  };
 
   useEffect(() => {
     const obtenerFicha = async () => {
@@ -105,13 +140,11 @@ const FichaDetalle = () => {
                     <TableCell>{aprendiz.numero_documento}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button  sx={{ border: "1px solid #71277a", color: "#71277a", fontSize: "10px", borderRadius: "5px" }}>
+                        <Button onClick={() => handleVerUsuario(aprendiz)} sx={{ border: "1px solid #71277a", color: "#71277a", fontSize: "10px", borderRadius: "5px" }}>
                           Ver usuario
                         </Button>
-                        <Button  sx={{
-                         backgroundColor: "red",p: 1,fontSize: "30px",color: "white",borderRadius: "5px", }}>
+                        <Button onClick={() => handleConfirmarEliminar(aprendiz)} sx={{ backgroundColor: "red", p: 1, fontSize: "30px", color: "white", borderRadius: "5px" }}>
                           <ContentCutIcon />
-                          <i className="ri-scissors-fill" />
                         </Button>
                       </Stack>
                     </TableCell>
@@ -124,8 +157,24 @@ const FichaDetalle = () => {
           <Typography>No hay aprendices registrados en esta ficha.</Typography>
         )}
       </Box>
+
+      {/* Modal Info Usuario */}
+      <UserInfoModal
+        open={openUserModal}
+        onClose={() => setOpenUserModal(false)}
+        user={selectedUser}
+      />
+
+      {/* Modal Confirmación */}
+      <ConfirmDialog
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={eliminarAprendiz}
+        title="¿Eliminar aprendiz?"
+        message={`¿Estás seguro que deseas eliminar a ${aprendizAEliminar?.nombre} de esta ficha?`}
+      />
     </Box>
   );
 };
 
-export default FichaDetalle;  
+export default FichaDetalle;

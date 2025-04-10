@@ -1,5 +1,3 @@
-//este es el menu y header en un solo codigo
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
@@ -41,6 +39,15 @@ const Navbar = ({ children }) => {
     setOpen(!open);
   };
 
+  // 🔐 Opciones del menú por rol
+  const menuItems = [
+    { text: "Inicio", icon: <HomeIcon />, route: "/inicio", roles: ["Administrador", "Instructor", "Aprendiz"] },
+    { text: "Usuarios", icon: <PeopleIcon />, route: "/usuarios", roles: ["Administrador"] },
+    { text: "Fichas", icon: <AssignmentIcon />, route: "/fichas", roles: ["Administrador", "Instructor"] },
+    { text: "Agendamientos", icon: <CalendarIcon />, route: "/agendamientos", roles: ["Administrador", "Instructor", "Aprendiz"] },
+    { text: "Seguimiento y control", icon: <AssignmentIcon />, route: "/seguimiento", roles: ["Administrador", "Instructor", "Aprendiz"] },
+  ];
+
   return (
     <Box sx={{ display: "flex", width: "100%" }}>
       <CssBaseline />
@@ -50,31 +57,28 @@ const Navbar = ({ children }) => {
         position="fixed"
         sx={{
           backgroundColor: "#71277a",
-          zIndex: open ? theme.zIndex.drawer - 1 : theme.zIndex.drawer + 1, // 🔹 Debajo del Drawer cuando está abierto
+          zIndex: open ? theme.zIndex.drawer - 1 : theme.zIndex.drawer + 1,
           width: "100%",
           boxShadow: "none",
         }}
       >
         <Toolbar>
-          {/* 🔹 Icono del Menú (Siempre visible y por encima de todo) */}
           <IconButton
             edge="start"
             color="inherit"
             onClick={toggleDrawer}
             sx={{
               position: "relative",
-              zIndex: theme.zIndex.drawer + 2, // 🔹 Siempre visible
+              zIndex: theme.zIndex.drawer + 2,
             }}
           >
             <MenuIcon />
           </IconButton>
 
-          {/* 🔹 Título */}
           <Typography variant="h6" sx={{ flexGrow: 1, fontSize: "1rem", ml: 1 }}>
             SISTEMA SAEP
           </Typography>
 
-          {/* 🔹 Nombre del usuario */}
           <Typography
             variant="body2"
             sx={{
@@ -105,7 +109,7 @@ const Navbar = ({ children }) => {
         open={open}
         onClose={toggleDrawer}
         sx={{
-          zIndex: theme.zIndex.drawer + 1, // 🔹 Más alto que la AppBar
+          zIndex: theme.zIndex.drawer + 1,
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             backgroundColor: "#71277a",
@@ -115,31 +119,28 @@ const Navbar = ({ children }) => {
         }}
       >
         <Box sx={{ width: drawerWidth, height: "100%", color: "white" }}>
-          {/* 🔹 Botón de Cerrar Menú (Usando el mismo botón de menú) */}
           <Box
-          sx={{
-            ml:2,
-            width:"85%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 1px",
-            borderBottom: "2px solid white",
-          }}
-        >
-            {/* 🔹 Icono del Menú */}
+            sx={{
+              ml: 2,
+              width: "85%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "8px 1px",
+              borderBottom: "2px solid white",
+            }}
+          >
             <IconButton onClick={toggleDrawer} sx={{ color: "white" }}>
               <MenuIcon />
             </IconButton>
 
-            {/* 🔹 Rol del Usuario */}
             <Typography
               variant="subtitle1"
               sx={{
                 color: "white",
                 fontWeight: "bold",
                 textAlign: "center",
-                mr:5,
+                mr: 5,
                 flexGrow: 1,
               }}
             >
@@ -147,20 +148,16 @@ const Navbar = ({ children }) => {
             </Typography>
           </Box>
 
-          {/* 🔹 Menú de opciones */}
+          {/* 🔹 Menú filtrado por rol */}
           <List>
-            {[
-              { text: "Inicio", icon: <HomeIcon />, route: "/inicio" },
-              { text: "Usuarios", icon: <PeopleIcon />, route: "/usuarios" },
-              { text: "Fichas", icon: <AssignmentIcon />, route: "/fichas" },
-              { text: "Agendamientos", icon: <CalendarIcon />, route: "/agendamientos" },
-              { text: "Seguimiento y control", icon: <AssignmentIcon />, route: "/seguimiento" },
-            ].map(({ text, icon, route }) => (
-              <ListItemButton key={text} component={Link} to={route}>
-                <ListItemIcon sx={{ color: "white", minWidth: "40px" }}>{icon}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            ))}
+            {menuItems
+              .filter((item) => item.roles.includes(user?.rol))
+              .map(({ text, icon, route }) => (
+                <ListItemButton key={text} component={Link} to={route}>
+                  <ListItemIcon sx={{ color: "white", minWidth: "40px" }}>{icon}</ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              ))}
           </List>
         </Box>
       </Drawer>
@@ -170,7 +167,7 @@ const Navbar = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          pl:"5%",
+          pl: "5%",
           pr: "5%",
           mt: 13,
           width: "100%",
