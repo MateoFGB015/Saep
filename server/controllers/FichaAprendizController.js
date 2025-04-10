@@ -26,28 +26,6 @@ exports.eliminarAprendizDeFicha = async (req, res) => {
   };
 
   
-  exports.obtenerAprendizDeFicha = async (req, res) => {
-    const { id_ficha, id_usuario } = req.params;
-  
-    try {
-      const relacion = await FichaAprendiz.findOne({
-        where: { id_ficha, id_usuario },
-        include: {
-          model: Usuario,
-          as: 'usuario',
-          attributes: ['id_usuario', 'nombre', 'apellido', 'correo_electronico', 'telefono']
-        }
-      });
-  
-      if (!relacion) {
-        return res.status(404).json({ mensaje: "No se encontró esta relación ficha-aprendiz" });
-      }
-  
-      res.status(200).json({ aprendiz: relacion.usuario });
-    } catch (error) {
-      console.error("❌ Error al obtener aprendiz:", error);
-      res.status(500).json({ mensaje: "Error del servidor al buscar aprendiz" });
-    }
-  };
+
   
 

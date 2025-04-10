@@ -22,6 +22,9 @@ import Calendario from "./features/agendamientos/components/calendarComponent";
 // 🔹 Página no autorizada
 import NoAutorizado from "./components/NoAutorizado";
 
+// paguina de bitacora 
+import BitacoraApp from "./features/Seguimiento/Seguimiento";
+
 function App() {
   return (
     <AuthProvider>
@@ -69,6 +72,14 @@ function App() {
                       element={
                         <ProtectedRoute allowedRoles={['Administrador', 'Instructor', 'Aprendiz']}>
                           <FichaDetalle />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/seguimiento"
+                      element={
+                        <ProtectedRoute allowedRoles={['Administrador', 'Instructor', 'Aprendiz']}>
+                          <BitacoraApp />
                         </ProtectedRoute>
                       }
                     />

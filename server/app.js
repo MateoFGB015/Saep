@@ -7,7 +7,7 @@ const usuariosRoutes = require('./routes/usuariosRoutes');
 const AgendamientoRoutes = require('./routes/AgendamientoRoutes')
 const fichasRoutes = require('./routes/fichasRoutes');
 const bitacoraRoutes = require('./routes/bitacoraRoutes');
-const FichaAprendiz = require('./routes/FichaAprendizRoutes');
+const fichaAprendiz = require('./routes/FichaAprendizRoutes');
 // const ObservacionRoutes = require('./routes/ObservacionRoutes');
 // const DocumentosRoutes = require('./routes/DocumentosRoutes');
 
@@ -30,7 +30,7 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/fichas', fichasRoutes);
 app.use('/agendamiento',AgendamientoRoutes);
 app.use('/Bitacora', bitacoraRoutes );
-app.use('/FichaAprendiz', FichaAprendiz);
+app.use('/fichaAprendiz', fichaAprendiz);
 // app.use('/observacion', ObservacionRoutes);
 // app.use('/documentos', DocumentosRoutes);
 
