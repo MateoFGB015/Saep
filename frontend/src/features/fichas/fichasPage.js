@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { 
   Button, TextField, Table, TableBody, TableCell, TableContainer, 
@@ -10,6 +11,7 @@ import {BorderColorOutlined, ContentCutOutlined, Add} from '@mui/icons-material'
 
 const FichasTable = () => {
   const [fichas, setFichas] = useState([]);
+  const { user } = useAuth();
   const [searchInput, setSearchInput] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -24,15 +26,33 @@ const FichasTable = () => {
   });
 
   useEffect(() => {
-    fetchFichas();
-  }, []);
+    if(user) {
+      fetchFichas();
+    }
+    
+  }, [user]);
 
-  const fetchFichas = () => {
-    axios
-      .get("http://localhost:3000/fichas/ver")
-      .then((response) => setFichas(response.data))
-      .catch((error) => console.error("Error al obtener las fichas:", error));
+  const fetchFichas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const endpoint =
+        user.rol === "Instructor"
+          ? "http://localhost:3000/fichas/instructor"
+          : "http://localhost:3000/fichas/ver";
+  
+      const response = await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      setFichas(response.data);
+    } catch (error) {
+      console.error("Error al obtener las fichas:", error);
+    }
   };
+  
 
   const navigate = useNavigate();
 

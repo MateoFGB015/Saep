@@ -53,6 +53,26 @@ exports.obtenerInfoFicha = async (req, res) => {
   }
 };
 
+// ​‌‍‌⁡⁢⁣⁣𝘝͟𝘦͟𝘳 𝘧͟𝘪͟𝘤͟𝘩͟𝘢͟𝘴 𝘥͟𝘦 𝘶͟𝘯 𝘪͟𝘯͟𝘴͟𝘵͟𝘳͟𝘶͟𝘤͟𝘵͟𝘰͟𝘳 𝘦͟𝘴͟𝘱͟𝘦͟𝘤͟í͟𝘧͟𝘪͟𝘤͟𝘰⁡​
+exports.obtenerFichasInstructor = async (req, res) => {
+  try {
+    const { id: id_usuario, rol } = req.usuario;
+
+    if (rol !== 'Instructor') {
+      return res.status(403).json({ mensaje: 'No tienes permisos para acceder a estas fichas.' });
+    }
+
+    const fichas = await Ficha.findAll({
+      where: { id_instructor: id_usuario }
+    });
+
+    res.status(200).json(fichas);
+  } catch (error) {
+    console.error('Error al obtener fichas del instructor:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
 
 // ⁡⁢⁢⁢​‌‌‍𝙎͟𝙪͟𝙗͟𝙞͟𝙧 𝙛͟𝙞͟𝙘͟𝙝͟𝙖​⁡
 exports.crearFicha = async (req, res) => {
